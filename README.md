@@ -38,6 +38,8 @@ subset_eigen.py -i dataset_input -p pop_list -o subseted_dataset_output
   
     
 It is a bit hard to explain what this script does. Just imagine that you have to test 80000 genetic models. You need one thread to test each model. There are 80 threads available on each node. You want to run 80 models (max capacity for each node) at a time per node and you want to run them in parallel on 10 nodes. This is the script for you. It will create qsub files for running the commands in parallel. 
+
+> You may need to modify the header for your cluster. See the script.
   
 I feel a bit nostalgic about this script. It was one of the first scripts I wrote. Here is how to use the script.
 
