@@ -58,7 +58,8 @@ ls | grep "${input}_split[0-9][0-9][0-9]" >temp_split_filelist
 
 function_create_qsub(){
 
-# add header to a newly generated file
+# add header to a newly generated file. 
+# !!!!!!!!!! You may need to modify the header according to your cluster.
 {
   echo '#!/bin/sh'
   echo "#PBS -N ${name_process}_${1}"
