@@ -1,0 +1,107 @@
+#!/bin/bash 
+
+if [ "$1" = "-h" ] ; then
+  echo "this script creates qsub files for our cluster
+        You must have list of your commands as input
+        You will see commands for running qsub in the file 'command_list_for_qsub' (output of this script)
+        Mandatory arguments
+        	-j [name of job]
+        	-i [input file which contains list of commands, you must have empty line as last line]
+        	-n [number of nodes you want to run]
+        	-t [threads per each node]
+        	-d [working directory]
+        
+        Please note that this script is written for our server.
+        
+        update 19/06/2019
+        "
+  exit 0
+fi
+
+while getopts n:i:j:t:q:d: option
+do
+	case "${option}"
+	in
+		n) node=${OPTARG};;
+		i) input=${OPTARG};;
+		j) name_process=${OPTARG};;
+		t) threads=${OPTARG};;
+#		q) q_name=${OPTARG};;
+		d) directory=${OPTARG};;
+		
+	esac
+done
+
+line=$(wc -l ${input}| awk '{print $1}')
+
+# xa has nothing to do with the current script, just here for a historical reason
+let xa=${line}/${node}
+#xb is for testing whether Modulus (remainder) =0, if not we will add 1 to test at a time
+let xb=${line}%${node}
+
+while [ $xb -ne 0 ]; do
+        let line=${line}+1
+        let xb=${line}%${node}
+done
+let fline=${line}/${node}
+
+#fline is number of lines for -l option in split command
+
+#split commands list into n (number of node) files
+split -a 3 --numeric-suffixes -l ${fline} ${input} ${input}_split
+
+
+# add the list of splitted files to temp_split_filelist
+ls | grep "${input}_split[0-9][0-9][0-9]" >temp_split_filelist
+
+# add header for qsub file, add parentheses and wait by the function
+
+function_create_qsub(){
+
+# add header to a newly generated file
+{
+  echo '#!/bin/sh'
+  echo "#PBS -N ${name_process}_${1}"
+  echo "#PBS -q batch"
+  echo "#PBS -l nodes=1:ppn=${threads}"
+  echo "#PBS -l walltime=999:99:99"
+  echo "cd ${directory}"
+} > ${input}_wait_${threads}run_${1}.qsub
+
+# get a file name form the list
+splitfile=$(awk -v line="${1}" -v col="1" 'NR == line { print $col }' <temp_split_filelist)
+
+# add parentheses to the start and the end of the command, than add & at the end then add them to an intermediate file
+sed 's/ \&$//g' ${splitfile} | sed -e 's/^/(/g' | sed -e "s/$/) \&/g" > ${splitfile}_brackets
+# add the string "wait" to each ${threads} lines then add to the qsub file
+awk -v n=${threads} '1; NR % n == 0 {print "wait"}' ${splitfile}_brackets >> ${input}_wait_${threads}run_${1}.qsub
+# add the string "wait" at the last line
+echo "wait" >> ${input}_wait_${threads}run_${1}.qsub
+# delete the intermediate file
+rm ${splitfile}_brackets
+# make the file executable (for fun)
+chmod +x ${input}_wait_${threads}run_${1}.qsub
+}
+
+# run the function 
+for i in $(seq 1 $node)
+do 
+		function_create_qsub $i
+done
+
+# add the qsub file names to a file called "command_list_for_qsub"
+
+for i in $(seq 1 $node)
+do
+	echo "qsub ${input}_wait_${threads}run_${i}.qsub"
+done > command_list_for_qsub
+
+
+# remove all intermediate files 
+while read i
+do
+	rm ${i}
+done<temp_split_filelist
+
+rm temp_split_filelist
+     

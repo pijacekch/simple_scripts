@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-i1', '--input1', help="prefix of input eigen dataset")
 parser.add_argument('-i2', '--input2', help="prefix of input eigen dataset")
 parser.add_argument('-o', '--output', help="prefix of output (subsetted) eigen dataset")
-#parser.add_argument('-p', '--popfile', help="a file containing list of populations, one pop per line")
+
 
 args = parser.parse_args()
 
