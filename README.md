@@ -3,6 +3,7 @@
 - [dataset preparation scripts](#dataset-preparation-scripts)
     - [subseting eigen files (subset\_eigen.py)](#subseting-eigen-files-subset_eigenpy)
     - [convert plink \[bed,bim,fam\] to eigen \[geno,snp,ind\] (the script name is b2e)](#convert-plink-bedbimfam-to-eigen-genosnpind-the-script-name-is-b2e)
+    - [convert  eigen \[geno,snp,ind\] to plink \[bed,bim,fam\] (the script name is e2b)](#convert--eigen-genosnpind-to-plink-bedbimfam-the-script-name-is-e2b)
 - [qsub related](#qsub-related)
     - [creating qsub files for running commands in parallel on many nodes (add\_wait\_qsub)](#creating-qsub-files-for-running-commands-in-parallel-on-many-nodes-add_wait_qsub)
 
@@ -45,6 +46,22 @@ flags
 ```
 b2e -e prefix_of_eigen_files -b prefix_of_plink_files -p par_file_name -d yes
 ```
+
+### convert  eigen [geno,snp,ind] to plink [bed,bim,fam] (the script name is e2b)
+
+You must have convertf in the PATH  
+        
+flags  
+\-e prefix of eigen files  
+\-b prefix of plink files (bed,bim,fam)  
+\-p par file name  
+\-d if want the script to delete ped file (intermediate file of this script) afterwards, type yes 
+
+```
+e2b -e prefix_of_eigen_files -b prefix_of_plink_files -p par_file_name -d yes
+```
+
+
 
 # qsub related 
 

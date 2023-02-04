@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if [ "$1" = "-h" ] ; then
+  echo "create bed files from eigen
+        -e prefix of eigen files
+        -b prefix of bed files
+        -p par file name
+		-d if want to delete ped file, type yes "
+  exit 0
+fi
+
+while getopts e:b:p:d: option
+do
+	case "${option}"
+	in
+		e) eigen=${OPTARG};;
+		b) bed=${OPTARG};;
+		p) par=${OPTARG};;
+		d) del=${OPTARG};;
+
+	esac
+done
+
+
+
+{
+echo "genotypename: ${eigen}.geno"
+echo "snpname:      ${eigen}.snp"
+echo "indivname:    ${eigen}.ind"
+echo "outputformat:    PED"
+echo "genotypeoutname: ${bed}_ped.ped"
+echo "snpoutname:      ${bed}_ped.map"
+echo "indivoutname:    ${bed}_ped.pedind"
+}> ${par} 
+
+convertf -p ${par} &> log_${par}
+
+plink --file ${bed}_ped --alleleACGT --allow-no-sex --make-bed --out ${bed}
+
+if [ "${del}" == "yes" ]
+then 
+rm ${bed}_ped.ped
+fi
+
