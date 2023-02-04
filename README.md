@@ -1,7 +1,7 @@
 - [last update](#last-update)
 - [*WARNING*](#warning)
 - [dataset preparation scripts](#dataset-preparation-scripts)
-    - [subseting eigen files (subset\_eigen.py)](#subseting-eigen-files-subset_eigenpy)
+    - [subset eigen files (subset\_eigen.py)](#subset-eigen-files-subset_eigenpy)
     - [convert plink \[bed,bim,fam\] to eigen \[geno,snp,ind\] (the script name is b2e)](#convert-plink-bedbimfam-to-eigen-genosnpind-the-script-name-is-b2e)
     - [convert  eigen \[geno,snp,ind\] to plink \[bed,bim,fam\] (the script name is e2b)](#convert--eigen-genosnpind-to-plink-bedbimfam-the-script-name-is-e2b)
 - [qsub related](#qsub-related)
@@ -17,15 +17,25 @@
 
 # dataset preparation scripts
 
-### subseting eigen files (subset_eigen.py)
+### subset eigen files (subset_eigen.py)
 
-subseting eigen dataset with list of population. You must have convertf in the PATH
+subset eigen dataset with list of population. You must have convertf in the PATH
 
 flags  
   
 \-i, --input: prefix of input eigen dataset  
 \-o, --output: prefix of output (subsetted) eigen dataset  
 \-p, --popfile: a file containing list of populations, one pop per line
+
+population list should look like this
+
+```
+popA
+popB
+popC
+popD
+```
+
 
 example  
 
@@ -34,7 +44,7 @@ subset_eigen.py -i dataset_input -p pop_list -o subseted_dataset_output
 ```
 ### convert plink [bed,bim,fam] to eigen [geno,snp,ind] (the script name is b2e)
 
-You must have convertf in the PATH  
+You must have plink and convertf in the PATH  
         
 flags
 
@@ -49,7 +59,7 @@ b2e -e prefix_of_eigen_files -b prefix_of_plink_files -p par_file_name -d yes
 
 ### convert  eigen [geno,snp,ind] to plink [bed,bim,fam] (the script name is e2b)
 
-You must have convertf in the PATH  
+You must have plink and convertf in the PATH  
         
 flags  
 \-e prefix of eigen files  
