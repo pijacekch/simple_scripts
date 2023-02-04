@@ -1,0 +1,45 @@
+#!/bin/bash
+
+if [ "$1" = "-h" ] ; then
+  echo "create eigen files from bed
+        -e prefix of eigen files
+        -b prefix of bed files
+        -p par file name
+		-d if want to delete ped file, type yes "
+  exit 0
+fi
+
+while getopts e:b:p:d: option
+do
+	case "${option}"
+	in
+		e) eigen=${OPTARG};;
+		b) bed=${OPTARG};;
+		p) par=${OPTARG};;
+		d) del=${OPTARG};;
+
+	esac
+done
+
+plink --bfile ${bed} --recode --out ${bed}_PED
+
+{
+echo "genotypename:    ${bed}_PED.ped"
+echo "snpname:         ${bed}_PED.map"
+echo "indivname:       ${bed}_PED.ped"
+echo "outputformat:    EIGENSTRAT"
+echo "genotypeoutname: ${eigen}.geno"
+echo "snpoutname:      ${eigen}.snp"
+echo "indivoutname:    ${eigen}.ind"
+echo "familynames:     NO"
+}>${par}_p2e
+
+convertf -p ${par}_p2e &> log_${par}_p2e
+
+mv ${eigen}.ind ${eigen}.ind_ori
+awk '{print $1 "\t" $2 "\t" $3}' ${eigen}.ind_ori > ${eigen}.ind
+
+if [ "${del}" == "yes" ]
+then 
+rm ${bed}_PED.ped
+fi
